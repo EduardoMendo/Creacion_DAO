@@ -1,10 +1,12 @@
 package org.efmb.facturacion.modelo;
 
 import java.time.*;
+import java.util.*;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
 
+import org.efmb.facturacion.calculadores.*;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
@@ -23,6 +25,8 @@ public class Factura {
 	String oid;
 	
 	@Column(length = 6)
+	@DefaultValueCalculator(value = CalculadorSiguienteNumeroParaAnyo.class,
+	properties = @PropertyValue(name = "anyo"))
 	int numero;
 	
 	@DefaultValueCalculator(CurrentYearCalculator.class)
@@ -33,9 +37,17 @@ public class Factura {
 	@Required
 	LocalDate fecha;
 	
+	@ManyToOne
+	(fetch=FetchType.LAZY,
+	optional=false)
+	Cliente cliente;
+	
+	@ElementCollection
+	@ListProperties("producto.numero, producto.descripcion, cantidad")
+	Collection<Detalle> detalles;
+	
 	@Stereotype("MEMO")
 	String observaciones;
-	
-	
+
 	
 }
